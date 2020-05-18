@@ -1,0 +1,55 @@
+const Message = require("./message.model");
+const ServerMessage = require("./server-message.model");
+const express = require("express");
+const http = require("http");
+const socketio = require("socket.io");
+
+const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
+const PORT = process.env.PORT || 8080;
+
+// let b = new Message("user").withText('text');
+// let a = new ServerMessage().withText('text');
+// console.log(a);
+
+app.get("/", (req, res) => {
+  res.send("<h1>Heyyyy ;)</h1>");
+});
+
+io.on("connection", (socket) => {
+  console.log("Someone connected :)");
+
+  let serverMsg = new ServerMessage();
+  let msg = new Message("user");
+
+  // Talk to the current user
+  socket.emit("chat-msg", serverMsg.withText("Welcome to MMsg!"));
+
+  setInterval(() => {
+    socket.emit("chat-msg", serverMsg.withText("Hi"));
+  }, 2000);
+
+  // Listen to current user
+  socket.on("chat-msg", (msg) => {
+    console.log(`Received Msg: ${msg}`);
+
+    io.emit("broadcast", serverMsg.withText("lmao"));
+  });
+
+  // Talk to Everyone
+  // io.emit();
+
+  // Talk to everyone except current user
+  socket.broadcast.emit("sys", `Someone connected`);
+
+  // When current user disconnects...
+  socket.on("disconnect", () => {
+    console.log("Someone disconnected :(");
+    io.emit("sys", "A user has left the chat");
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`listening on: ${PORT}`);
+});
