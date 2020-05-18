@@ -2,6 +2,8 @@ import * as express from "express";
 import * as socketio from "socket.io";
 import { User } from "./types/user.model";
 import { UserManager } from "./types/user-manager.model";
+import { Message } from "./types/message.model";
+import { ServerMsg } from "./types/server-msg.model";
 const http = require("http");
 
 const app = express();
@@ -14,6 +16,7 @@ app.get("/", (req: any, res: any) => {
 });
 
 let users: UserManager = new UserManager();
+let serverMsg: ServerMsg = new ServerMsg();
 
 io.on("connection", (socket: socketio.Socket) => {
     console.log("Someone connected :)");
@@ -24,11 +27,14 @@ io.on("connection", (socket: socketio.Socket) => {
 
         socket.join(user.room);
 
-        socket.emit("server-msg", "Welcome to MMsg!");
+        socket.emit("server-msg", serverMsg.create("Welcome to MMsg!"));
 
         socket.broadcast
             .to(user.room)
-            .emit("server-msg", `${user.name} has entered the chat!`);
+            .emit(
+                "server-msg",
+                serverMsg.create(`${user.name} has entered the chat!`)
+            );
 
         users.add(user);
 
@@ -51,6 +57,7 @@ io.on("connection", (socket: socketio.Socket) => {
         console.log(`[${user.name}]: ${msg}`);
 
         socket.broadcast.to(user.room).emit("chat-msg", user.createMsg(msg));
+        socket.emit("confirm-msg", user.createMsg(msg));
     });
 
     // Talk to Everyone
@@ -61,9 +68,8 @@ io.on("connection", (socket: socketio.Socket) => {
 
     // When current user disconnects...
     socket.on("disconnect", () => {
-        
         console.log("Someone disconnected :(");
-        io.emit("server-msg", `Someone has left the chat`);
+        io.emit("server-msg", serverMsg.create(`Someone has left the chat`));
     });
 });
 

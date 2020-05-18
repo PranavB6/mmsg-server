@@ -1,4 +1,4 @@
-const Message = require("./message.model");
+const Message = require("./src/models/message.model");
 const ServerMessage = require("./server-message.model");
 const express = require("express");
 const http = require("http");

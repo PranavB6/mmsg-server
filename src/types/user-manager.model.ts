@@ -16,7 +16,7 @@ export class UserManager {
     }
 
     getUsersInRoom(room: string) {
-        return this.users.filter(user => user.room === room);
+        return this.users.filter((user) => user.room === room);
     }
 
     remove(id: string) {
