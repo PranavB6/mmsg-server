@@ -68,11 +68,14 @@ io.on("connection", (socket: socketio.Socket) => {
 
     // When current user disconnects...
     socket.on("disconnect", () => {
-        console.log("Someone disconnected :(");
-        io.emit("server-msg", serverMsg.create(`Someone has left the chat`));
+        const user = users.get(socket.id);
+
+        console.log(`[${user.name}] disconnected :(`);
+        socket.broadcast.to(user.room).emit("server-msg", serverMsg.create(`${user.name} has left the chat`));
     });
 });
 
 server.listen(PORT, () => {
     console.log(`listening on: ${PORT}`);
 });
+
