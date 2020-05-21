@@ -72,6 +72,8 @@ io.on("connection", (socket: socketio.Socket) => {
 
         console.log(`[${user.name}] disconnected :(`);
         socket.broadcast.to(user.room).emit("server-msg", serverMsg.create(`${user.name} has left the chat`));
+
+        users.remove(user.id);
     });
 });
 
