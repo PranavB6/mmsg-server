@@ -8,7 +8,8 @@ const http = require("http");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketio(server, { origins: '*:*'});
+const io = socketio(server);
+io.origins('*:*');
 const PORT = process.env.PORT || 8080;
 
 app.get("/", (req: any, res: any) => {
