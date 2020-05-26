@@ -96,7 +96,7 @@ io.on("connection", (socket: socketio.Socket) => {
             io.to(user.room).emit("rps-result", result);
         } else {
             rpsGame.start(user, hand);
-            io.to(user.room).emit("rps-start", `${user.name} started a game`);
+            io.to(user.room).emit("server-msg", serverMsg.create(`${user.name} started a game`));
         }
     });
 
